@@ -318,7 +318,7 @@
             <span class="modal-icon">😏</span>
             <div class="modal-title">แบร่</div>
             <div class="modal-text">พิมพ์ไปก็ไม่รู้หรอกว่าพิมพ์ไรมา อยากบ่นอยากบอกอะไรก็ทักมาบอกในแชทค้าฟฟฟฟฟ</div>
-            <button id="btnRun" class="btn" onmouseover="movePrankButton()" onclick="closePrankModal()">โดนแกล้งแล้วล่ะไอ้อ้วนนิ้ง</button>
+            <button class="btn" onclick="closePrankModal()">โดนแกล้งแล้วล่ะไอ้อ้วนนิ้ง</button>
         </div>
     </div>
 
@@ -333,7 +333,7 @@
     <div id="screen-login" class="screen active">
         <div class="content-box">
             <h2>🎄 คิสสะมาสควิซ 🎄</h2>
-            <p>กรอกชื่อของแกน่ะแหละ<br></p>
+            <p>กรอกชื่อของแกนั่นแหละ<br></p>
             <input type="text" id="userName" placeholder="พิมพ์ชื่อแกไอ้อ้วนนิ้ง" autocomplete="off">
             <button class="btn" onclick="startQuiz()">ตรวจสอบ</button>
         </div>
@@ -494,32 +494,7 @@
 
         function createStars(){const c=document.getElementById('starContainer');for(let i=0;i<60;i++){const s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*70+'%';s.style.width=Math.random()*3+'px';s.style.height=s.style.width;s.style.setProperty('--duration',Math.random()*3+2+'s');c.appendChild(s);}}createStars();
         function createSnow(){const c=document.getElementById('snow-container');const s=document.createElement('div');s.className='snowflake';s.innerHTML='❄';s.style.left=Math.random()*100+'vw';s.style.animationDuration=Math.random()*3+2+'s';s.style.fontSize=Math.random()*10+10+'px';c.appendChild(s);setTimeout(()=>{s.remove()},5000);}setInterval(createSnow,100);
-    // --- 🏃‍♂️ ฟังก์ชันปุ่มหนี (The Runaway Button) 🏃‍♂️ ---
-let escapeCount = 0; // ตัวนับว่าหนีไปกี่ครั้งแล้ว
 
-function movePrankButton() {
-    const btn = document.getElementById('btnRun');
-    
-    // ตั้งค่าให้หนีแค่ 6 ครั้งพอ (เดี๋ยวเพื่อนทุบคอม)
-    if (escapeCount >= 6) {
-        btn.innerText = "อะ ยอมให้กดก็ได้ 🙄";
-        btn.style.position = 'static'; // กลับมาอยู่ที่เดิม
-        btn.style.transform = 'none';
-        return;
-    }
-
-    // คำนวณสุ่มตำแหน่งใหม่บนหน้าจอ
-    const x = Math.random() * (window.innerWidth - 120); // ลบความกว้างปุ่ม
-    const y = Math.random() * (window.innerHeight - 60); // ลบความสูงปุ่ม
-
-    // สั่งให้ปุ่มลอยไปตำแหน่งใหม่
-    btn.style.position = 'fixed'; 
-    btn.style.left = x + 'px';
-    btn.style.top = y + 'px';
-    btn.style.zIndex = '9999'; // ให้อยู่บนสุดเสมอ
-    
-    escapeCount++; // บวกจำนวนครั้งที่หนี
-}
     </script>
 </body>
 </html>
