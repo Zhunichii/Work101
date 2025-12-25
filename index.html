@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Quiz 🎄</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;500;600&family=Mountains+of+Christmas:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CORE STYLES --- */
+        body {
+            margin: 0; padding: 0;
+            background: linear-gradient(to bottom, #020111 0%, #193c56 100%);
+            min-height: 100vh; height: 100dvh;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; font-family: 'Prompt', sans-serif; color: white; position: relative;
+            touch-action: manipulation;
+        }
+
+        /* --- BACKGROUND ATMOSPHERE --- */
+        .aurora {
+            position: absolute; top: -20%; left: -20%; width: 140%; height: 60%;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 136, 0.15), rgba(0, 0, 0, 0) 60%),
+                        radial-gradient(circle at 20% 40%, rgba(120, 0, 255, 0.1), rgba(0, 0, 0, 0) 50%);
+            filter: blur(40px); opacity: 0.8; animation: moveAurora 10s infinite alternate; z-index: 1;
+        }
+        @keyframes moveAurora { from { transform: translateX(-20px) scale(1); } to { transform: translateX(20px) scale(1.1); } }
+
+        .moon {
+            position: absolute; top: 40px; right: 40px; width: 70px; height: 70px;
+            background: #fffdf0; border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255, 253, 240, 0.8), 0 0 80px rgba(255, 255, 255, 0.4);
+            z-index: 1;
+        }
+
+        .mountain-bg { position: absolute; bottom: 0; left: 0; width: 100%; height: 35vh; background: #112635; border-radius: 50% 50% 0 0 / 100% 100% 0 0; transform: scaleX(1.5); z-index: 2; opacity: 0.8; }
+        .mountain-bg-2 { position: absolute; bottom: 0; right: -20%; width: 100%; height: 25vh; background: #19384d; border-radius: 50% 50% 0 0 / 100% 100% 0 0; transform: scaleX(1.5); z-index: 3; opacity: 0.9; }
+        .ground { position: absolute; bottom: -80px; left: 0; width: 100%; height: 220px; background: linear-gradient(to top, #ddecf7, #f0f8ff); border-radius: 50% 50% 0 0 / 100% 100% 0 0; box-shadow: 0 -10px 40px rgba(255,255,255,0.4); z-index: 4; }
+
+        /* --- 🌲 TREES 🌲 --- */
+        .tree-wrapper { position: absolute; bottom: 80px; z-index: 5; filter: drop-shadow(0 15px 10px rgba(0,0,0,0.3)); }
+        .tree-part { width: 0; height: 0; position: absolute; left: 50%; transform: translateX(-50%); border-left: solid transparent; border-right: solid transparent; border-bottom: solid #145c3e; }
+        .tree-part::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: solid transparent; border-right: solid transparent; border-bottom: solid #fff; z-index: 2; }
+        .tree-top { border-width: 0 25px 35px 25px; bottom: 65px; z-index: 13; border-bottom-color: #2d8a63; }
+        .tree-top::after { border-width: 0 25px 15px 25px; top: 0px; border-bottom-color: rgba(255,255,255,0.9); }
+        .tree-mid { border-width: 0 38px 45px 38px; bottom: 35px; z-index: 12; border-bottom-color: #1e6b48; }
+        .tree-mid::after { border-width: 0 38px 18px 38px; top: 0px; border-bottom-color: rgba(255,255,255,0.85); }
+        .tree-bot { border-width: 0 50px 55px 50px; bottom: 0px; z-index: 11; border-bottom-color: #145239; }
+        .tree-bot::after { border-width: 0 50px 20px 50px; top: 0px; border-bottom-color: rgba(255,255,255,0.8); }
+        .tree-trunk { width: 18px; height: 25px; background: #3e2723; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); border-radius: 3px; z-index: 10; }
+        
+        .t-1 { left: 12%; transform: scale(1.1); }
+        .t-2 { left: -5%; transform: scale(1.4); bottom: 40px; filter: blur(2px); z-index: 6; }
+        .t-3 { right: 15%; transform: scale(0.9); bottom: 100px; opacity: 0.9; }
+        .t-4 { right: 5%; transform: scale(1.25); bottom: 60px; }
+
+        /* Stars & Snow */
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--duration) infinite ease-in-out; opacity: 0; }
+        @keyframes twinkle { 0% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: scale(0.5); } }
+        .snowflake { position: absolute; top: -10px; color: #fff; animation: fall linear forwards; pointer-events: none; z-index: 20; text-shadow: 0 0 3px rgba(255,255,255,0.8); }
+        @keyframes fall { to { transform: translateY(105vh); } }
+
+        /* Content Boxes */
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; justify-content: center; align-items: center; position: absolute; top: 0; left: 0; z-index: 30; animation: fadeIn 0.6s ease-in-out; }
+        .screen.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .content-box {
+            background: rgba(16, 26, 41, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15); text-align: center; width: 85%; max-width: 400px;
+        }
+        h2 { margin-bottom: 10px; color: #fdcb6e; font-weight: 600; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        p { margin-bottom: 25px; font-size: 1rem; color: #e0e0e0; line-height: 1.5; }
+        
+        input[type="text"], textarea { 
+            width: 80%; padding: 12px; margin-bottom: 20px; border-radius: 15px; border: none; 
+            text-align: center; font-family: 'Prompt', sans-serif; font-size: 1rem; 
+            background: rgba(255,255,255,0.9); resize: none;
+        }
+        textarea { height: 80px; text-align: left; padding: 15px; }
+        
+        .btn { padding: 12px 30px; background: linear-gradient(45deg, #d63031, #e84118); color: white; border: none; border-radius: 25px; cursor: pointer; font-family: 'Prompt', sans-serif; transition: 0.2s; margin: 5px; box-shadow: 0 5px 15px rgba(214, 48, 49, 0.4); }
+        .btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+        .choice-btn { display: block; width: 100%; margin: 10px 0; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); color: white; transition: 0.3s; }
+        .choice-btn:hover { background-color: #00b894; border-color: #00b894; transform: translateX(5px); }
+
+        /* Gift & Card */
+        .gift-container { position: relative; cursor: pointer; transition: transform 0.3s; z-index: 40; }
+        .gift-container:hover { transform: scale(1.05) rotate(2deg); }
+        .gift-box { width: 150px; height: 150px; background-color: #d63031; position: relative; border-radius: 5px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+        .lid { width: 170px; height: 40px; background-color: #e17055; position: absolute; top: -30px; left: -10px; border-radius: 5px; transition: transform 0.5s; z-index: 41; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .ribbon-v { width: 30px; height: 100%; background: #fdcb6e; position: absolute; left: 50%; transform: translateX(-50%); }
+        .ribbon-h { width: 100%; height: 30px; background: #fdcb6e; position: absolute; top: 50%; transform: translateY(-50%); }
+        
+        .card { display: none; background: #fff; color: #333; padding: 30px; border-radius: 15px; text-align: center; width: 400px; max-width: 80%; animation: popUp 0.6s; z-index: 50; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+        .card h1 { font-family: 'Mountains of Christmas', cursive; color: #d63031; font-size: 2.8rem; margin-top: 0; }
+        .card-img { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid #d63031; margin: 0 auto 15px auto; display: block; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        /* --- 🆕 STYLES สำหรับ POPUP ที่ทำเอง 🆕 --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); /* พื้นหลังสีดำจางๆ */
+            z-index: 100; /* อยู่บนสุด */
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: 0.3s; /* ซ่อนไว้ก่อน */
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; } /* คลาสสำหรับโชว์ */
+        
+        .modal-box {
+            background: white; color: #333;
+            width: 80%; max-width: 320px;
+            padding: 30px; border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: scale(0.8); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* เอฟเฟกต์เด้งดึ๋ง */
+        }
+        .modal-overlay.show .modal-box { transform: scale(1); }
+        
+        .modal-icon { font-size: 3rem; margin-bottom: 10px; display: block; }
+        .modal-title { font-size: 1.4rem; font-weight: 600; color: #d63031; margin-bottom: 10px; }
+        .modal-text { font-size: 1rem; color: #555; line-height: 1.5; margin-bottom: 25px; }
+
+        @keyframes popUp { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <audio id="bgMusic" loop>
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="prankModal" class="modal-overlay">
+        <div class="modal-box">
+            <span class="modal-icon">😌</span>
+            <div class="modal-title">แบร่</div>
+            <div class="modal-text">พิมพ์ไปก็ไม่รู้หรอกว่าพิมพ์ไรมา อยากบ่นอยากบอกอะไรก็ทักมาบอกในแชทค้าฟฟฟฟฟ</div>
+            <button id="btnRun" class="btn" onmouseover="movePrankButton()" onclick="closePrankModal()">โดนแกล้งแล้วล่ะไออ้วนนิ้ง</button>
+        </div>
+    </div>
+
+    <div class="aurora"></div><div class="stars" id="starContainer"></div><div class="moon"></div>
+    <div class="mountain-bg"></div><div class="mountain-bg-2"></div><div class="ground"></div>
+    <div class="tree-wrapper t-1"><div class="tree-part tree-top"></div><div class="tree-part tree-mid"></div><div class="tree-part tree-bot"></div><div class="tree-trunk"></div></div>
+    <div class="tree-wrapper t-2"><div class="tree-part tree-top"></div><div class="tree-part tree-mid"></div><div class="tree-part tree-bot"></div><div class="tree-trunk"></div></div>
+    <div class="tree-wrapper t-3"><div class="tree-part tree-top"></div><div class="tree-part tree-mid"></div><div class="tree-part tree-bot"></div><div class="tree-trunk"></div></div>
+    <div class="tree-wrapper t-4"><div class="tree-part tree-top"></div><div class="tree-part tree-mid"></div><div class="tree-part tree-bot"></div><div class="tree-trunk"></div></div>
+    <div id="snow-container"></div>
+
+    <div id="screen-login" class="screen active">
+        <div class="content-box">
+            <h2>🎄 คิสสะมาสควิซ 🎄</h2>
+            <p>กรอกชื่อของแกนั่นแหละ<br></p>
+            <input type="text" id="userName" placeholder="พิมพ์ชื่อแกไออ้วนนิ้ง" autocomplete="off">
+            <button class="btn" onclick="startQuiz()">ตรวจสอบ</button>
+        </div>
+    </div>
+
+    <div id="screen-quiz" class="screen">
+        <div class="content-box">
+            <h2 id="q-text">คำถาม...</h2>
+            <div id="choice-area" class="choice-container"></div>
+        </div>
+    </div>
+
+    <div id="screen-loading" class="screen">
+        <div class="content-box">
+            <h2>⏳ กำลังประมวลผล...</h2>
+            <p>พี่มั้นกำลังส่งข้อมูลไปขั้วโลกเหนือ<br>รอแปปนึงนะ</p>
+        </div>
+    </div>
+
+    <div id="screen-message" class="screen">
+        <div class="content-box">
+            <h2>💬 ฝากข้อความถึงคนทำ</h2>
+            <p>อยากบ่นหรืออยากบอกอะไร<br>พิมพ์ไว้ช่องนี้ได้เลย 👇</p>
+            <textarea id="userMsg" placeholder="เช่น ทำไมหล่อจัง, ทำไมเท่ขนาดนี้"></textarea>
+            <button class="btn" onclick="submitMessage()">ส่งข้อความ</button>
+        </div>
+    </div>
+
+    <div id="screen-gift" class="screen">
+        <div class="gift-container" id="giftBox" onclick="openGift()">
+            <div class="lid" id="boxLid"><div class="ribbon-v"></div></div>
+            <div class="gift-box"><div class="ribbon-v"></div><div class="ribbon-h"></div></div>
+            <div style="margin-top:30px; text-shadow: 0 2px 4px black; font-weight: 500; position: relative; z-index: 45;">แตะเพื่อเปิดของขวัญ 🎁</div>
+        </div>
+        <div class="card" id="messageCard">
+            <img src="santa.jpg" class="card-img" alt="My Photo">
+            <h1>Merry Christmas!</h1>
+            <h2 id="displayName" style="color: #00b894; font-size: 1.5rem;"></h2>
+            <p id="finalMessage" style="color: #555; min-height: 100px;"></p>
+        </div>
+    </div>
+
+    <script>
+        const quizQuestions = [
+            { question: "ปีนี้คิดว่าตัวเองเป็นเด็กดีแค่ไหน?", answers: ["ดีมากกกก", "ก็มีดื้อบ้างนิดหน่อย", "เป็นเด็กดีน่ารักที่สุดในโลก"] },
+            { question: "แล้วปีหน้าคิดว่าตัวเองจะเป็นเด็กดีมั้ย?", answers: ["เป็นแน่นอน", "ไม่บอกมุ้บมิ้บ", "เป็นบ้างไม่เป็นบ้าง"] },
+            { question: "ถ้าขอพรได้1ข้อจะขออะไร?", answers: ["ขอให้พี่มั้นเลิกดื้อ(แต่ผมไม่เคยดื้อ)", "ขอให้ได้นอนเย้อๆ", "ขอไม่รับคำสาปทั้งจักรวาล"] },
+            { question: "ปีหน้าจะเบื่อพี่มั้นรึยัง", answers: ["ไม่เบื่อ", "ไม่มีทาง", "ไม่มีวัน"] },
+            { question: "รักพี่มั้นแค่ไหน", answers: ["รักมากมาก", "รักที่สุด", "รักมากที่สุดเลยล่ะ"] }
+        ];
+
+        let currentQ = 0; let userName = "";
+
+        function startQuiz() {
+            const input = document.getElementById('userName');
+            if (input.value.trim() === "") { alert("กรุณาใส่ชื่อก่อนค้าฟฟฟ 🎅"); return; }
+            userName = input.value;
+            
+            const audio = document.getElementById('bgMusic');
+            audio.volume = 0.5; 
+            audio.play().catch(e => console.log("Audio error:", e));
+
+            document.getElementById('screen-login').classList.remove('active');
+            document.getElementById('screen-quiz').classList.add('active');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQ >= quizQuestions.length) { finishQuiz(); return; }
+            const data = quizQuestions[currentQ];
+            document.getElementById('q-text').innerText = data.question;
+            const area = document.getElementById('choice-area');
+            area.innerHTML = "";
+            data.answers.forEach(ans => {
+                const btn = document.createElement('button');
+                btn.className = 'btn choice-btn';
+                btn.innerText = ans;
+                btn.onclick = () => nextQuestion();
+                area.appendChild(btn);
+            });
+        }
+
+        function nextQuestion() {
+            currentQ++;
+            const box = document.querySelector('#screen-quiz .content-box');
+            box.style.opacity = 0;
+            setTimeout(() => { showQuestion(); box.style.opacity = 1; }, 200);
+        }
+
+        function finishQuiz() {
+            document.getElementById('screen-quiz').classList.remove('active');
+            document.getElementById('screen-loading').classList.add('active');
+            setTimeout(() => {
+                document.getElementById('screen-loading').classList.remove('active');
+                document.getElementById('screen-message').classList.add('active');
+            }, 2500);
+        }
+
+        // --- 👇 โค้ดส่วนที่แก้ใหม่ (Custom Popup) 👇 ---
+
+        function submitMessage() {
+            const msg = document.getElementById('userMsg').value;
+            // ถ้าไม่พิมพ์อะไร ก็ให้โชว์ Popup เตือนก่อน
+            if(msg.trim() === "") {
+                // อันนี้ใช้ alert ธรรมดาก็ได้ หรือจะทำ Popup แยกอีกอันก็ได้ แต่อนุโลมใช้ alert สำหรับ validate
+                alert("จะส่งกระดาษเปล่าเหรอ พิมพ์อะไรมาหน่อยสิ! 😠");
+                return;
+            }
+
+            // ✅ สั่งโชว์ Custom Popup ที่เราสร้างเอง
+            document.getElementById('prankModal').classList.add('show');
+        }
+
+        function closePrankModal() {
+            // 1. ซ่อน Popup
+            document.getElementById('prankModal').classList.remove('show');
+
+            // 2. เปลี่ยนหน้าไปที่หน้าของขวัญ
+            document.getElementById('screen-message').classList.remove('active');
+            document.getElementById('screen-gift').classList.add('active');
+            document.getElementById('displayName').innerText = "ถึง" + userName;
+        }
+
+        function typeWriterEffect(text, elementId, speed) {
+    let i = 0;
+    const target = document.getElementById(elementId);
+    target.innerHTML = ""; // เคลียร์ของเก่า
+    function type() {
+        if (i < text.length) {
+            // แปลง \n ให้เป็น <br> เพื่อขึ้นบรรทัดใหม่
+            if(text.charAt(i) === "\n") {
+                target.innerHTML += "<br>";
+            } else {
+                target.innerHTML += text.charAt(i);
+            }
+            i++;
+            setTimeout(type, speed);
+        }
+    }
+    type();
+}
+        // ----------------------------------------------
+
+        function openGift() {
+    // 1. เปิดฝากล่อง
+    document.getElementById('boxLid').style.transform = "translateY(-20px) rotate(-10deg)";
+    
+    // 2. ยิงพลุฉลอง!! (เพิ่มตรงนี้)
+    var duration = 3 * 1000; // ยิงนาน 3 วินาที
+    var animationEnd = Date.now() + duration;
+    var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+    function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+    var interval = setInterval(function() {
+        var timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) { return clearInterval(interval); }
+        var particleCount = 50 * (timeLeft / duration);
+        // ยิงจากซ้ายและขวา
+        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+    }, 250);
+
+    // 3. แสดงการ์ดข้อความ (หน่วงเวลาไว้นิดนึงให้พลุขึ้นก่อน)
+    setTimeout(() => {
+        document.getElementById('giftBox').classList.add('hidden');
+        document.getElementById('messageCard').style.display = 'block';
+        const msg = "คริสต์มาสปีนี้ปีแรกของเรา\n ขอให้แกมีความสุข ยิ้มเยอะๆ สุขภาพแข็งแรง\nไม่รู้ว่าจะเป็นคิสสะมาสที่ดีสำหรับแกมั้ย\nแต่สำหรับพี่สิ่งที่แกทำให้มันคือครั้งแรกเลย\nขอบคุณที่เข้ามาในชีวิตแล้วทำให้วันดีๆแบบนี้\n เป็นวันเวลาดีๆที่พิเศษสำหรับพี่นะ รักน้องนิ้งที่สุดเล้ยยยยย💖\nจากพี่ม้านนนนนน";
+typeWriterEffect(msg, "finalMessage", 50);
+    }, 500); // รอ 0.5 วิค่อยโชว์การ์ด
+}
+
+        function createStars(){const c=document.getElementById('starContainer');for(let i=0;i<60;i++){const s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*70+'%';s.style.width=Math.random()*3+'px';s.style.height=s.style.width;s.style.setProperty('--duration',Math.random()*3+2+'s');c.appendChild(s);}}createStars();
+        function createSnow(){const c=document.getElementById('snow-container');const s=document.createElement('div');s.className='snowflake';s.innerHTML='❄';s.style.left=Math.random()*100+'vw';s.style.animationDuration=Math.random()*3+2+'s';s.style.fontSize=Math.random()*10+10+'px';c.appendChild(s);setTimeout(()=>{s.remove()},5000);}setInterval(createSnow,100);
+    // --- 🏃‍♂️ ฟังก์ชันปุ่มหนี (The Runaway Button) 🏃‍♂️ ---
+let escapeCount = 0; // ตัวนับว่าหนีไปกี่ครั้งแล้ว
+
+function movePrankButton() {
+    const btn = document.getElementById('btnRun');
+    
+    // ตั้งค่าให้หนีแค่ 6 ครั้งพอ (เดี๋ยวเพื่อนทุบคอม)
+    if (escapeCount >= 6) {
+        btn.innerText = "อะ ยอมให้กดก็ได้ 🙄";
+        btn.style.position = 'static'; // กลับมาอยู่ที่เดิม
+        btn.style.transform = 'none';
+        return;
+    }
+
+    // คำนวณสุ่มตำแหน่งใหม่บนหน้าจอ
+    const x = Math.random() * (window.innerWidth - 120); // ลบความกว้างปุ่ม
+    const y = Math.random() * (window.innerHeight - 60); // ลบความสูงปุ่ม
+
+    // สั่งให้ปุ่มลอยไปตำแหน่งใหม่
+    btn.style.position = 'fixed'; 
+    btn.style.left = x + 'px';
+    btn.style.top = y + 'px';
+    btn.style.zIndex = '9999'; // ให้อยู่บนสุดเสมอ
+    
+    escapeCount++; // บวกจำนวนครั้งที่หนี
+}
+    </script>
+</body>
+</html>
